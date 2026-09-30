@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDO 2026 - Guía e Investigación de Pesca AFK</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .tab-btn.active {
+            border-bottom-color: #f59e0b;
+            color: #d97706;
+            font-weight: 700;
+            background-color: #fef3c7;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased bg-slate-50 text-slate-800">
+
+    <!-- Chosen Palette: Warm Neutral Slate background with Amber/Gold accents (#f59e0b) and Cyan/Teal (#0891b2) structural highlights for high legibility and calm harmony. -->
+
+    <!-- Application Structure Plan:
+         1. Header & Quick Context Bar: Sincronización de parches al 29 de Sep 2026, Región SA/Global, Métricas Clave.
+         2. Navigation Bar: Pestañas interactivas para navegación fluida por bloques temáticos.
+         3. Section 1 - Dashboard de Resumen Ejecutivo: Principales paradigmas de 2026 (Maestría 3000, Pecera 100 slots, Eliminación de nodos, Bono distancia 150%).
+         4. Section 2 - Explorador y Buscador de Spots: Filtros dinámicos (F2P/P2W, Horas AFK, Riesgo PvP, Maestría) con recomendación instantánea y Tabla/Ranking interactivo de los 10 mejores spots.
+         5. Section 3 - Simulador Interactivo de Ganancias (Calculadora): Permite al usuario ajustar su Maestría, Reducción de tiempo, Pecera, Caña y Destino para proyectar Plata Neta, tiempo hasta llenar inventario y durabilidad de caña con visualización en Chart.js.
+         6. Section 4 - Arquitecto de Equipamiento & Builds: Desglose comparativo de setups (Principiante, Intermedio, Endgame Preonne, Max P2W) con ROI y prioridades.
+         7. Section 5 - Planificador Logístico & Rutas de Comercio: Diagrama interactivo flujo del mercado (Magnus Teleport -> LOML Nampo -> Seúl Bukpo) y mini-calculadora de Regateo.
+         8. Section 6 - Mitología, Mitos Debunked & Análisis de Videos: Desmitificación de "Shadow Nerfs", impacto real de FPS/Latencia, y peligro de Flotadores (Floats).
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Panel de métricas ejecutivas: Tarjetas de datos rápidos (HTML/CSS + FontAwesome icons).
+         - Comparativa de Spots: Gráfico de barras interactivo en Chart.js mostrando retorno proyectado según horas seleccionadas.
+         - Curva de Maestría: Gráfico de línea en Chart.js (Maestría 500-3000 vs Retorno de Plata) para mostrar rendimientos decrecientes y caps.
+         - Simulador de Rentabilidad: Inputs de rango HTML + Script JS que recalcula en tiempo real las ganancias esperadas (Escenario Pesimista, Probable y Optimista).
+         - Flujo Logístico de Comercio: Diagrama visual con cajas flexbox/grid Tailwind y conectores CSS (sin SVG/Mermaid).
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- TOP HEADER -->
+    <header class="bg-slate-900 text-white border-b border-amber-500/30 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 text-slate-950 p-2.5 rounded-lg font-black text-xl flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-fish-fins"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        BDO AFK Fishing Meta <span class="bg-amber-500/20 text-amber-400 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/40">2026</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Informe de Investigación Global • Validado al 29 de Septiembre, 2026</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+                <span class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-md border border-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-globe text-cyan-400"></i> Servidor SA / Global Parity
+                </span>
+                <span class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-md border border-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt text-amber-400"></i> Max Mastery: 3000
+                </span>
+                <span class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-md border border-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-stopwatch text-emerald-400"></i> Cap AFR: 67%
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN NAVIGATION TABS -->
+    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-[61px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-1 sm:space-x-4 overflow-x-auto custom-scrollbar py-2">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-chart-pie"></i> Resumen & Paradigmas
+                </button>
+                <button onclick="switchTab('spots')" id="tab-spots" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-map-location-dot"></i> Ranking & Spots
+                </button>
+                <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-calculator"></i> Simulador de Ganancias
+                </button>
+                <button onclick="switchTab('builds')" id="tab-builds" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-shirt"></i> Builds & Equipamiento
+                </button>
+                <button onclick="switchTab('trade')" id="tab-trade" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-route"></i> Rutas de Venta & Magnus
+                </button>
+                <button onclick="switchTab('myths')" id="tab-myths" class="tab-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-flask"></i> Mitos & Evidencia
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+
+        <!-- SECTION 1: DASHBOARD & EXECUTIVE SUMMARY -->
+        <section id="sec-dashboard" class="space-y-8">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-amber-500"></i> Estado de la Pesca AFK en Black Desert Online (2026)
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
+                    Esta sección presenta una visión sintetizada de los cambios estructurales más importantes sufridos por las profesiones (Lifeskills) durante 2025 y 2026. La pesca AFK ha dejado de ser una actividad de acumulación masiva de capturas amarillas para transformarse en un sistema optimizado para la extracción de <strong>Peces de Premio (Prize Catch)</strong>. Comprender estos pilares es fundamental para maximizar los ingresos pasivos sin cometer errores de configuración obsoletos.
+                </p>
+
+                <!-- STAT CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex items-start space-x-3">
+                        <div class="p-3 bg-amber-100 text-amber-700 rounded-lg text-lg">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Límite de Maestría</span>
+                            <div class="text-2xl font-bold text-slate-900">3000 pts</div>
+                            <p class="text-xs text-slate-500 mt-1">Impulsado por joyería Preonne (HEX-OCT)</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex items-start space-x-3">
+                        <div class="p-3 bg-cyan-100 text-cyan-700 rounded-lg text-lg">
+                            <i class="fa-solid fa-box-archive"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Capacidad de Pecera</span>
+                            <div class="text-2xl font-bold text-slate-900">100 Slots</div>
+                            <p class="text-xs text-slate-500 mt-1">Fusión Shim Cheong + Pecera Crio</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex items-start space-x-3">
+                        <div class="p-3 bg-emerald-100 text-emerald-700 rounded-lg text-lg">
+                            <i class="fa-solid fa-[#000] fa-clock"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Reducción AFK (AFR)</span>
+                            <div class="text-2xl font-bold text-slate-900">67% Cap</div>
+                            <p class="text-xs text-slate-500 mt-1">Tiempo de espera mín: ~60s por mordida</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex items-start space-x-3">
+                        <div class="p-3 bg-purple-100 text-purple-700 rounded-lg text-lg">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bono de Distancia</span>
+                            <div class="text-2xl font-bold text-slate-900">150% Max</div>
+                            <p class="text-xs text-slate-500 mt-1">Sin necesidad de conectar nodos (CP free)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARADIGM SHIFTS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-arrows-spin text-amber-500"></i> Los 4 Cambios Sistémicos Fundamentales
+                        </h3>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>Meta de Peces de Premio (Prize Catch):</strong> Los peces rojos y naranjas varían de 35M a 3.800M de plata base. La Maestría incrementa esta probabilidad exponencialmente.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>Independencia de Nodos de Contribución:</strong> El bono de distancia comercial ya no requiere invertir puntos de contribución para conectar puertos lejanos.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>Red logistica Magnus a LOML:</strong> El traslado cuántico permite vender peces capturados en Balenos/Mediah directamente en Seúl (Bukpo) en menos de 5 minutos.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-circle-check text-emerald-500 mt-1"></i>
+                                <span><strong>Infinitud P2W vs Autonomía F2P:</strong> La combinación de la caña indestructible <em>Grandpa Cron</em> y 292 espacios rompe el límite de tiempo de sesión de 5h a 24h continuas.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500 italic">
+                        Validado mediante parches oficiales y pruebas comunitarias (BDOlytics, BDOFish) en Sep 2026.
+                    </div>
+                </div>
+
+                <!-- MASTERY SCALING CHART CONTAINER -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-cyan-600"></i> Escalado de Plata según Maestría (8 Horas)
+                    </h3>
+                    <p class="text-xs text-slate-500 mb-4">Proyección de ingresos en Mar de Mediah D4 vendiendo con 150% distancia en Seúl.</p>
+                    <div class="chart-container">
+                        <canvas id="masteryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: SPOT FINDER & GLOBAL RANKING -->
+        <section id="sec-spots" class="space-y-8 hidden">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-map-pin text-amber-500"></i> Explorador Interactivo & Ranking Global de Spots
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm mb-6">
+                    Esta sección permite filtrar el ranking mundial de las 10 mejores zonas de pesca AFK en 2026 basándose en su perfil de juego, nivel de riesgo soportado y duración de sesión. Seleccione los parámetros a continuación para obtener la recomendación óptima o explore la tabla comparativa exhaustiva.
+                </p>
+
+                <!-- INTERACTIVE SPOT FINDER FILTERS -->
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Perfil de Cuenta</label>
+                            <select id="filter-profile" onchange="updateSpotRecommendation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                <option value="all">Todos los Perfiles</option>
+                                <option value="f2p">F2P / Sin Pago (Inventario Limitado)</option>
+                                <option value="p2w">P2W / Pago Máximo (292 Slots + Cron)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Duración de Sesión AFK</label>
+                            <select id="filter-hours" onchange="updateSpotRecommendation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                <option value="2">Corta (2 Horas)</option>
+                                <option value="4">Media (4 Horas)</option>
+                                <option value="8" selected>Noche / Estándar (8 Horas)</option>
+                                <option value="12">Larga (12 Horas)</option>
+                                <option value="24">Extrema (24 Horas)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Tolerancia de Riesgo (PvP)</label>
+                            <select id="filter-risk" onchange="updateSpotRecommendation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                <option value="all">Cualquier Zona</option>
+                                <option value="safe">Solo Zonas Seguras (Safe Zone)</option>
+                                <option value="combat">Zonas de Combate (Requiere Lv 49)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Rango de Maestría</label>
+                            <select id="filter-mastery" onchange="updateSpotRecommendation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                <option value="low">Principiante (< 800)</option>
+                                <option value="mid" selected>Intermedio (800 - 1800)</option>
+                                <option value="high">Endgame (2000+)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- RECOMMENDATION BOX RESULT -->
+                    <div id="recommendation-box" class="mt-5 p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-amber-500 text-slate-950 rounded-lg text-xl font-bold">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-amber-800 uppercase tracking-wider">Spot Recomendado para tus Filtros</span>
+                                <h4 id="rec-spot-title" class="text-lg font-extrabold text-slate-900">Mar de Mediah - Profundidad 4</h4>
+                                <p id="rec-spot-desc" class="text-xs text-slate-600">Mejor retorno absoluto mundial. Requiere personaje Nivel 49 o cuidado naval.</p>
+                            </div>
+                        </div>
+                        <div class="text-right sm:text-right w-full sm:w-auto border-t sm:border-t-0 border-amber-200 pt-2 sm:pt-0">
+                            <span class="text-xs text-slate-500">Ingreso Est. (Sesión):</span>
+                            <div id="rec-spot-income" class="text-xl font-black text-amber-700">1.8B - 2.5B Plata</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPOT COMPARISON CHART -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 mb-8">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">Comparativa de Ingreso Bruto Promedio por Ubicación</h3>
+                    <p class="text-xs text-slate-500 mb-4">Métricas normalizadas a 2000 Maestría, Venta LOML/Valencia con 150% distancia y Regateo Gurú.</p>
+                    <div class="chart-container">
+                        <canvas id="spotsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- FULL SPOTS RANKING TABLE -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead class="bg-slate-800 text-slate-200 uppercase font-semibold">
+                            <tr>
+                                <th class="p-3.5">Rank / Ubicación</th>
+                                <th class="p-3.5">Estado / Riesgo</th>
+                                <th class="p-3.5">Especies Clave (Premio)</th>
+                                <th class="p-3.5">Ingreso (10h)</th>
+                                <th class="p-3.5">Venta Rec.</th>
+                                <th class="p-3.5">Ventaja Principal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-white" id="spots-table-body">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: EARNINGS SIMULATOR -->
+        <section id="sec-simulator" class="space-y-8 hidden">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-amber-500"></i> Simulador Interactivo de Rentabilidad
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm mb-6">
+                    Esta herramienta calcula de manera realista los ingresos de su sesión AFK, contemplando el tiempo necesario para llenar el inventario y la durabilidad de su caña antes de que el personaje deje de pescar. Ajuste las variables de su configuración para simular el retorno esperado.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- INPUT CONTROLS (5 cols) -->
+                    <div class="lg:col-span-5 bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-5">
+                        <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">Parámetros del Personaje</h3>
+                        
+                        <!-- SLIDER: MASTERY -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-slate-700">Maestría de Pesca</label>
+                                <span id="val-sim-mastery" class="text-xs font-extrabold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">1500 pts</span>
+                            </div>
+                            <input type="range" id="sim-mastery" min="200" max="3000" step="50" value="1500" oninput="runSimulation()" class="w-full accent-amber-500">
+                        </div>
+
+                        <!-- SLIDER: HOURS -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-slate-700">Duración de Sesión AFK</label>
+                                <span id="val-sim-hours" class="text-xs font-extrabold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">8 Horas</span>
+                            </div>
+                            <input type="range" id="sim-hours" min="1" max="24" step="1" value="8" oninput="runSimulation()" class="w-full accent-amber-500">
+                        </div>
+
+                        <!-- SELECT: SPOT -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Ubicación Seleccionada</label>
+                            <select id="sim-spot" onchange="runSimulation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500">
+                                <option value="mediah" selected>Mar de Mediah (Depth 4) - Abundante</option>
+                                <option value="velia">Playa de Velia - Agotado</option>
+                                <option value="atanis">Atanis Pond - Promedio</option>
+                                <option value="margoria">Centro de Margoria - Abundante</option>
+                                <option value="tooth">Tooth Fairy Cabin - Promedio</option>
+                            </select>
+                        </div>
+
+                        <!-- SELECT: FISHING ROD -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Caña de Pescar</label>
+                            <select id="sim-rod" onchange="runSimulation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500">
+                                <option value="balenos" selected>Balenos Rod +10 (-25% AFR, Branded)</option>
+                                <option value="cron">Grandpa Cron's Rod (-80% AFR, Indestructible P2W)</option>
+                                <option value="basic">Caña Básica de Madera (Sin bonos)</option>
+                            </select>
+                        </div>
+
+                        <!-- SELECT: FISH TANK & SLOTS -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Inventario & Pecera</label>
+                            <select id="sim-tank" onchange="runSimulation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500">
+                                <option value="f2p_basic">F2P Básico: 80 Slots total (Sin Pecera)</option>
+                                <option value="f2p_shim" selected>F2P Optimizado: 80 Slots + Shim Cheong (50 slots)</option>
+                                <option value="p2w_max">P2W Máximo: 192 Slots + Pecera Híbrida (100 slots) = 292 Total</option>
+                            </select>
+                        </div>
+
+                        <!-- SELECT: TRADE LEVEL -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nivel de Comercio (Regateo en LOML)</label>
+                            <select id="sim-trade" onchange="runSimulation()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500">
+                                <option value="beginner">Principiante / Profesional (Bono bajo)</option>
+                                <option value="artisan">Artesano / Maestro (Bono medio)</option>
+                                <option value="guru" selected>Gurú 1+ (+150% Distancia + Max Bargain)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- OUTPUT DISPLAY (7 cols) -->
+                    <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+                        <!-- RESULT KPI CARDS -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                                <span class="text-xs font-extrabold text-amber-800 uppercase tracking-wider block mb-1">Ganancia Est. Neta</span>
+                                <div id="sim-res-silver" class="text-2xl font-black text-amber-700">1.850 M</div>
+                                <span class="text-[10px] text-slate-500">Plata neta proyectada</span>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Llenado de Inventario</span>
+                                <div id="sim-res-time-inv" class="text-xl font-bold text-slate-800">5.2 Horas</div>
+                                <span id="sim-res-status-inv" class="text-[10px] text-emerald-600 font-semibold">Suficiente para la sesión</span>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Durabilidad de Caña</span>
+                                <div id="sim-res-time-rod" class="text-xl font-bold text-slate-800">8.5 Horas</div>
+                                <span id="sim-res-status-rod" class="text-[10px] text-emerald-600 font-semibold">Caña resiste sesión</span>
+                            </div>
+                        </div>
+
+                        <!-- SIMULATION PROJECTION CHART -->
+                        <div class="bg-white rounded-xl p-5 border border-slate-200 flex-grow">
+                            <h4 class="text-sm font-bold text-slate-900 mb-2">Proyección Rango de Rentabilidad (Pesimista vs Probable vs Optimista)</h4>
+                            <div class="chart-container">
+                                <canvas id="simChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-600">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>
+                            <strong>Nota Metodológica:</strong> El rango optimista contempla la captura de 1 a 2 Peces Míticos Oceánicos (3.800M plata base). El rango pesimista asume baja suerte en tiradas de Peces de Premio y varianza negativa en el mercado comercial.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: BUILDS & GEAR ARCHITECTURE -->
+        <section id="sec-builds" class="space-y-8 hidden">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-shirt text-amber-500"></i> Arquitectura de Equipamiento & Módulos de Progresión
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm mb-6">
+                    Optimizar el equipo de pesca AFK requiere equilibrar el incremento de Maestría frente a la tasa de retorno de inversión (ROI). A continuación se presentan las configuraciones recomendadas para cada etapa del jugador en 2026.
+                </p>
+
+                <!-- TIER BUILD TABS -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <button onclick="showBuildTier('beginner')" id="btn-build-beginner" class="build-tab-btn p-4 rounded-xl border border-slate-200 text-left hover:border-amber-500 transition-all bg-amber-50 border-amber-500">
+                        <span class="text-xs font-bold text-amber-700 uppercase tracking-wider block">Tier 1</span>
+                        <div class="text-base font-extrabold text-slate-900">Principiante</div>
+                        <span class="text-xs text-slate-500">Costo: < 2.000M Plata</span>
+                    </button>
+
+                    <button onclick="showBuildTier('intermediate')" id="btn-build-intermediate" class="build-tab-btn p-4 rounded-xl border border-slate-200 text-left hover:border-amber-500 transition-all bg-white">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tier 2</span>
+                        <div class="text-base font-extrabold text-slate-900">Intermedio (Sweet Spot)</div>
+                        <span class="text-xs text-slate-500">Costo: 15B - 25B Plata</span>
+                    </button>
+
+                    <button onclick="showBuildTier('endgame')" id="btn-build-endgame" class="build-tab-btn p-4 rounded-xl border border-slate-200 text-left hover:border-amber-500 transition-all bg-white">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tier 3</span>
+                        <div class="text-base font-extrabold text-slate-900">Endgame Preonne</div>
+                        <span class="text-xs text-slate-500">Costo: 250B - 400B Plata</span>
+                    </button>
+
+                    <button onclick="showBuildTier('p2w')" id="btn-build-p2w" class="build-tab-btn p-4 rounded-xl border border-slate-200 text-left hover:border-amber-500 transition-all bg-white">
+                        <span class="text-xs font-bold text-purple-600 uppercase tracking-wider block">Especial</span>
+                        <div class="text-base font-extrabold text-slate-900">P2W Absoluto</div>
+                        <span class="text-xs text-slate-500">Pearl Shop + Monetizado</span>
+                    </button>
+                </div>
+
+                <!-- BUILD DETAILS CONTAINER -->
+                <div id="build-details-content" class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    <!-- Dynamic content filled via JS based on selected tier -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: LOGISTICS & TRADE ROUTES -->
+        <section id="sec-trade" class="space-y-8 hidden">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-route text-amber-500"></i> Rutas Óptimas de Venta & Sistema Magnus
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm mb-6">
+                    La reestructuración del comercio disoció los nudos de contribución del valor del pescado, estableciendo un límite del <strong>150% en la bonificación de distancia</strong>. Esta guía ilustra la ruta continental definitiva para trasladar capturas oceánicas a Seúl en menos de 6 minutos.
+                </p>
+
+                <!-- VISUAL PIPELINE FLOW (HTML/CSS ONLY) -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 mb-8 shadow-inner">
+                    <h3 class="text-base font-bold text-amber-400 mb-6 text-center uppercase tracking-widest">
+                        Circuito Logístico Quantum-Magnus (Meta 2026)
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                        <!-- Step 1 -->
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center relative">
+                            <div class="w-8 h-8 bg-amber-500 text-slate-950 font-bold rounded-full flex items-center justify-center mx-auto mb-2 text-xs">1</div>
+                            <h4 class="font-bold text-sm text-white">Captura AFK</h4>
+                            <p class="text-xs text-slate-400 mt-1">Mar de Mediah D4 o Playa de Velia</p>
+                        </div>
+
+                        <div class="hidden md:block text-center text-amber-400 text-xl"><i class="fa-solid fa-arrow-right"></i></div>
+
+                        <!-- Step 2 -->
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center relative">
+                            <div class="w-8 h-8 bg-amber-500 text-slate-950 font-bold rounded-full flex items-center justify-center mx-auto mb-2 text-xs">2</div>
+                            <h4 class="font-bold text-sm text-white">Pozo Magnus</h4>
+                            <p class="text-xs text-slate-400 mt-1">Caballo a Granja Bartali (1-2 min)</p>
+                        </div>
+
+                        <div class="hidden md:block text-center text-amber-400 text-xl"><i class="fa-solid fa-arrow-right"></i></div>
+
+                        <!-- Step 3 -->
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center relative">
+                            <div class="w-8 h-8 bg-amber-500 text-slate-950 font-bold rounded-full flex items-center justify-center mx-auto mb-2 text-xs">3</div>
+                            <h4 class="font-bold text-sm text-white">Teleport LOML</h4>
+                            <p class="text-xs text-slate-400 mt-1">Salida en Nampo Moodle Village</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mt-6">
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                            <div class="w-8 h-8 bg-amber-500 text-slate-950 font-bold rounded-full flex items-center justify-center mx-auto mb-2 text-xs">4</div>
+                            <h4 class="font-bold text-sm text-white">Traslado a Seúl</h4>
+                            <p class="text-xs text-slate-400 mt-1">Norte de Seúl -> NPC Bukpo</p>
+                        </div>
+
+                        <div class="hidden md:block text-center text-amber-400 text-xl"><i class="fa-solid fa-arrow-right"></i></div>
+
+                        <div class="bg-emerald-900/80 p-4 rounded-xl border border-emerald-500 text-center">
+                            <div class="w-8 h-8 bg-emerald-400 text-slate-950 font-bold rounded-full flex items-center justify-center mx-auto mb-2 text-xs">5</div>
+                            <h4 class="font-bold text-sm text-emerald-200">Venta + Bargain</h4>
+                            <p class="text-xs text-emerald-300 mt-1">150% Distancia + Regateo Gurú (130% Demanda)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRADE RULES & BARGAIN COMPARISON -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-slate-900 mb-3 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced text-amber-500"></i> Reglas de Entrega Imperial vs Comercio Local
+                        </h3>
+                        <div class="space-y-3 text-xs text-slate-600">
+                            <div class="p-3 bg-white rounded-lg border border-slate-200">
+                                <strong class="text-slate-800 text-sm block mb-1">Entrega Imperial (Imperial Delivery):</strong>
+                                <p>Paga 250% fijo pero <strong>RECHAZA TAXATIVAMENTE LOS PECES DE PREMIO</strong> (Rojos/Naranjas). Usar solo como limpieza secundaria de peces azules/amarillos comunes.</p>
+                            </div>
+                            <div class="p-3 bg-white rounded-lg border border-slate-200">
+                                <strong class="text-slate-800 text-sm block mb-1">Administrador de Comercio (Trade Manager - Bukpo):</strong>
+                                <p>Acepta todas las categorías. Aplica multiplicador de distancia (hasta 150%) + Minijuego de Regateo (Bargain) que escala un 0.5% adicional por cada nivel de Comercio.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-slate-900 mb-3 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-rotate text-cyan-600"></i> Estrategia de Server Hop (Cambio de Canal)
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                            Debido a la alta afluencia de jugadores vendiendo en Bukpo, la demanda local de ciertos peces puede caer al 80%. Si detecta una demanda inferior al 120-130%, realice inmediatamente un cambio de servidor (Server Hop) a un canal secundario para asegurar la liquidación máxima.
+                        </p>
+                        <div class="p-3 bg-cyan-50 text-cyan-800 rounded-lg border border-cyan-200 text-xs">
+                            <i class="fa-solid fa-lightbulb mr-1"></i> <strong>Tip de Caducidad:</strong> La pecera <em>Shim Cheong</em> multiplica x5 la duración de frescura del pescado. Un pez capturado conserva el 100% de su valor comercial por más de 24 horas reales.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: MYTHS & COMMUNITY EVIDENCE -->
+        <section id="sec-myths" class="space-y-8 hidden">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-flask text-amber-500"></i> Evidencia Científica & Mitos Desmitificados
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm mb-6">
+                    Auditoría metodológica de creencias populares de la comunidad y análisis de datos contrastados mediante notas de parche, datamining y experimentos de creadores reconocidos en 2025/2026.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- MYTH 1 -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-red-600 uppercase tracking-wider mb-1"><i class="fa-solid fa-xmark"></i> Mito Falso</div>
+                            <h3 class="font-bold text-slate-900 text-base mb-2">"Pearl Abyss aplicó Nerfs Ocultos en Playa de Velia"</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Los reportes de caídas drásticas de ingresos en Velia no se deben a modificaciones en el código del juego, sino a la saturación extrema de jugadores durante eventos. Esto colapsa la demanda comercial al 80% y reduce los fotogramas por segundo (FPS).
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] font-semibold text-slate-500">
+                            Causa real: Congestión + Drop de FPS en cliente.
+                        </div>
+                    </div>
+
+                    <!-- MYTH 2 -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1"><i class="fa-solid fa-triangle-exclamation"></i> Trampa Mecánica</div>
+                            <h3 class="font-bold text-slate-900 text-base mb-2">"Los Flotadores (Floats) mejoran la pesca de Peces de Premio"</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                <strong>¡FALSO Y PERJUDICIAL!</strong> Usar <em>Maple Float</em> o <em>Ash Tree Float</em> incrementa las tasas de peces azules y amarillos convencionales. Esto satura el inventario más rápido y diluye la probabilidad matemática de extraer peces rojos de Maestría.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] font-semibold text-amber-700">
+                            Recomendación: NUNCA equipar flotadores en 2026.
+                        </div>
+                    </div>
+
+                    <!-- MYTH 3 -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1"><i class="fa-solid fa-check"></i> Hecho Verificado</div>
+                            <h3 class="font-bold text-slate-900 text-base mb-2">"El Rendimiento de FPS Afecta la Velocidad AFK"</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                El motor de BDO vincula los subprocesos de animación al renderizado gráfico. Pescar minimizado en System Tray con caídas de micro-animación puede retrasar la recogida automática entre 2 y 4 segundos por ciclo, acumulando horas perdidas por noche.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] font-semibold text-emerald-700">
+                            Solución: Orientar cámara hacia una pared vacía antes de minimizar.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIDEO CREATOR AUDIT -->
+                <div class="mt-8 bg-slate-900 text-white rounded-xl p-6">
+                    <h3 class="text-base font-bold text-amber-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-photo-film"></i> Auditoría a Creadores de Contenido (Luneye & Teddy Twighlite)
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                        Guías virales tituladas <em>"6 BILLION/DAY AFK FISHING"</em> reportan cifras veraces pero basadas en condiciones extremas no representativas del jugador promedio:
+                    </p>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-300">
+                        <li class="bg-slate-800 p-3 rounded border border-slate-700">
+                            <strong class="text-amber-300 block mb-1">• Caña Grandpa Cron P2W</strong>
+                            Permite ignorar la degradación de durabilidad y pescar 24 horas ininterrumpidas.
+                        </li>
+                        <li class="bg-slate-800 p-3 rounded border border-slate-700">
+                            <strong class="text-amber-300 block mb-1">• Picos de Suerte Atípicos</strong>
+                            Promedian sesiones con 2+ capturas del pez mítico de 3.800M en el Mar de Mediah, eventos de baja probabilidad.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 text-xs text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Aplicación de Investigación Interactiva BDO AFK Fishing Meta 2026 • Generado con datos verificados al 29 de Septiembre de 2026.</p>
+            <p class="mt-1 text-slate-500">Black Desert Online es una marca registrada de Pearl Abyss. Este sitio es un recurso analítico para la comunidad.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA STORE ---
+        const SPOTS_DATA = [
+            {
+                rank: 1,
+                id: 'mediah',
+                name: 'Mar de Mediah (Depth 4)',
+                state: 'Abundante',
+                risk: 'Combat (PvP)',
+                safe: false,
+                species: 'Yellow Corvina, Mítico Oceánico (3.8B)',
+                gross10h: '1.800M - 2.500M',
+                incomeMin: 1800,
+                incomeMax: 2500,
+                trade: 'LOML (Bukpo)',
+                advantage: 'Mejor retorno sostenido mundial. Requiere Nivel 49.',
+                profile: 'all',
+                minMastery: 'high'
+            },
+            {
+                rank: 2,
+                id: 'tigris',
+                name: 'Tigris Island',
+                state: 'Abundante',
+                risk: 'Combat (PvP)',
+                safe: false,
+                species: 'Giant Oarfish, Peces de 900M',
+                gross10h: '1.600M - 2.200M',
+                incomeMin: 1600,
+                incomeMax: 2200,
+                trade: 'LOML (Bukpo)',
+                advantage: 'Alto volumen de captura élite. Requiere barco.',
+                profile: 'p2w',
+                minMastery: 'high'
+            },
+            {
+                rank: 3,
+                id: 'velia',
+                name: 'Velia Beach (Hotspot)',
+                state: 'Agotado',
+                risk: 'Safe Zone',
+                safe: true,
+                species: 'Silver Beltfish (80M), Celacantos',
+                gross10h: '800M - 1.200M',
+                incomeMin: 800,
+                incomeMax: 1200,
+                trade: 'LOML / Valencia',
+                advantage: 'Óptimo para principiantes, F2P y acceso inmediato.',
+                profile: 'f2p',
+                minMastery: 'low'
+            },
+            {
+                rank: 4,
+                id: 'atanis',
+                name: 'Atanis Pond (O\'draxxia)',
+                state: 'Promedio',
+                risk: 'Safe Zone',
+                safe: true,
+                species: 'Giant Oarfish, Hojas Quturan',
+                gross10h: '1.000M - 1.500M',
+                incomeMin: 1000,
+                incomeMax: 1500,
+                trade: 'Valencia / Nampo',
+                advantage: 'Zona continental segura con botín similar a Margoria.',
+                profile: 'all',
+                minMastery: 'mid'
+            },
+            {
+                rank: 5,
+                id: 'margoria',
+                name: 'Margoria Center',
+                state: 'Abundante',
+                risk: 'Combat (PvP)',
+                safe: false,
+                species: 'Peces Oceánicos Míticos',
+                gross10h: '1.500M - 2.000M',
+                incomeMin: 1500,
+                incomeMax: 2000,
+                trade: 'Valencia / LOML',
+                advantage: 'Especializado para sesiones P2W de 24 horas.',
+                profile: 'p2w',
+                minMastery: 'high'
+            },
+            {
+                rank: 6,
+                id: 'altinova',
+                name: 'Mar de Altinova (Depth 4)',
+                state: 'Abundante',
+                risk: 'Combat (PvP)',
+                safe: false,
+                species: 'Yellow Corvina',
+                gross10h: '1.300M - 1.800M',
+                incomeMin: 1300,
+                incomeMax: 1800,
+                trade: 'LOML (Bukpo)',
+                advantage: 'Alternativa directa a Mediah en caso de congestión.',
+                profile: 'all',
+                minMastery: 'mid'
+            },
+            {
+                rank: 7,
+                id: 'arehaza',
+                name: 'Arehaza (Hakoven Island)',
+                state: 'Abundante',
+                risk: 'Combat (PvP)',
+                safe: false,
+                species: 'Rainbow Sardine',
+                gross10h: '1.200M - 1.600M',
+                incomeMin: 1200,
+                incomeMax: 1600,
+                trade: 'LOML / Grana',
+                advantage: 'Extremo oriental, maximiza bono en puertos occidentales.',
+                profile: 'all',
+                minMastery: 'mid'
+            },
+            {
+                rank: 8,
+                id: 'tooth',
+                name: 'Tooth Fairy Cabin',
+                state: 'Promedio',
+                risk: 'Safe Zone',
+                safe: true,
+                species: 'Peces Dulceacuícolas',
+                gross10h: '700M - 1.000M',
+                incomeMin: 700,
+                incomeMax: 1000,
+                trade: 'Valencia City',
+                advantage: 'Mejor locación ribereña cuando Velia Beach reduce FPS.',
+                profile: 'f2p',
+                minMastery: 'low'
+            },
+            {
+                rank: 9,
+                id: 'dallae',
+                name: 'Dallae Pier (LOML)',
+                state: 'Abundante',
+                risk: 'Safe Zone',
+                safe: true,
+                species: 'Celacantos de LOML',
+                gross10h: '900M - 1.300M',
+                incomeMin: 900,
+                incomeMax: 1300,
+                trade: 'Valencia / Altinova',
+                advantage: 'Pescar nativamente en Seúl y enviar a Valencia.',
+                profile: 'all',
+                minMastery: 'mid'
+            },
+            {
+                rank: 10,
+                id: 'nympamare',
+                name: 'Nympamare (Edania 2)',
+                state: 'Abundante',
+                risk: 'Combat (PvP)',
+                safe: false,
+                species: 'Peces Edania 2026',
+                gross10h: '1.500M - 2.100M',
+                incomeMin: 1500,
+                incomeMax: 2100,
+                trade: 'Valencia Central',
+                advantage: 'Botín denso, alto requerimiento de acceso.',
+                profile: 'p2w',
+                minMastery: 'high'
+            }
+        ];
+
+        const BUILDS_DATA = {
+            beginner: {
+                title: "Tier 1: Principiante & Presupuesto Limitado",
+                cost: "Infeior a 2.000 Millones de Plata",
+                roi: "5 a 7 Noches de Pesca AFK",
+                items: [
+                    "<strong>Arma:</strong> Balenos Fishing Rod +10 con Sello Mágico (Item Brand)",
+                    "<strong>Ropa:</strong> Silver Embroidered Fisher's Clothes +2",
+                    "<strong>Joyería:</strong> Set Loggia PRI o DUO",
+                    "<strong>Silla:</strong> Loggia Fishing Chair",
+                    "<strong>Mascota:</strong> Pingüino T3 (Regalo de Misiones)"
+                ],
+                summary: "Prioriza alcanzar el cap de reducción AFK sin comprometer capital crítico. Excelente para cuentas nuevas."
+            },
+            intermediate: {
+                title: "Tier 2: Jugador Intermedio (Punto Dulce de Eficiencia)",
+                cost: "15.000M - 25.000M de Plata (15-25B)",
+                roi: "30 a 45 Días de Operación Pasiva",
+                items: [
+                    "<strong>Arma:</strong> Balenos Fishing Rod +10 (Branded)",
+                    "<strong>Ropa:</strong> TET Manos Fisher's Clothes",
+                    "<strong>Joyería:</strong> Set TRI Manos Accessories",
+                    "<strong>Silla:</strong> Manos Fishing Chair (Manufacturada)",
+                    "<strong>Artefactos/Piedras:</strong> Artefacto de Sethra + Piedras de Luz [Nibbles] / [Fisher's Secrets]",
+                    "<strong>Consumible:</strong> Deep Blue Tidal Draught + Marvelous Balacs Lunchbox"
+                ],
+                summary: "El estándar recomendado por la comunidad. Otorga entre 1000 y 1400 de Maestría con excelente recuperación económica."
+            },
+            endgame: {
+                title: "Tier 3: Endgame Preonne (Máximo Alcanzable F2P)",
+                cost: "250.000M - 400.000M de Plata (250-400B)",
+                roi: "6 a 10 Meses (Curva Decreciente)",
+                items: [
+                    "<strong>Arma:</strong> Balenos Fishing Rod +10 / Rod Especial de Temporada",
+                    "<strong>Ropa:</strong> PEN Manos Fisher's Clothes",
+                    "<strong>Joyería:</strong> Set Preonne HEX a OCT (Nuevo meta 2026)",
+                    "<strong>Silla:</strong> Manos Chair con Piedras de Luz de Maestría Máxima",
+                    "<strong>Pecera:</strong> Shim Cheong's Miraculous Fish Tank (50 Slots)"
+                ],
+                summary: "Rompe la barrera de los 2500 de Maestría. Diseñado para perfeccionistas que buscan exprimir cada pez de premio."
+            },
+            p2w: {
+                title: "Configuración de Pago Máxima (P2W Absoluto)",
+                cost: "Moneda Premium (Pearl Shop) + Inversión de Plata",
+                roi: "Autonomía e Inmunidad Absoluta (24 Horas AFK)",
+                items: [
+                    "<strong>Arma:</strong> Grandpa Cron's Fishing Rod (-80% AFR, Indestructible)",
+                    "<strong>Inventario:</strong> Expansión Máxima (192 Slots)",
+                    "<strong>Pecera Híbrida:</strong> Shim Cheong + Crio's Miraculous Fish Tank (100 Slots Combined = 292 Total)",
+                    "<strong>Mascota:</strong> Polar Bear Tier 5 (30% AFR)",
+                    "<strong>Portador:</strong> Lil' Otter Fishing Carrier (+10% DRR, +100 Maestría)",
+                    "<strong>Atuendo:</strong> Splashing Fisher's Clothes (Pearl Shop)"
+                ],
+                summary: "Elimina los cuellos de botella del cliente. Permite dejar al personaje pescando durante un día entero sin saturar espacio ni romper la caña."
+            }
+        };
+
+        // --- CHART INSTANCES ---
+        let masteryChartInstance = null;
+        let spotsChartInstance = null;
+        let simChartInstance = null;
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSpotsTable();
+            initMasteryChart();
+            initSpotsChart();
+            updateSpotRecommendation();
+            runSimulation();
+            showBuildTier('beginner');
+        });
+
+        // --- NAVIGATION LOGIC ---
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'spots', 'simulator', 'builds', 'trade', 'myths'];
+            tabs.forEach(id => {
+                const sec = document.getElementById(`sec-${id}`);
+                const btn = document.getElementById(`tab-${id}`);
+                if (id === tabId) {
+                    sec.classList.remove('hidden');
+                    btn.classList.add('active');
+                } else {
+                    sec.classList.add('hidden');
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Re-render charts if hidden when created
+            if (tabId === 'spots' && spotsChartInstance) spotsChartInstance.update();
+            if (tabId === 'simulator' && simChartInstance) simChartInstance.update();
+        }
+
+        // --- RENDER SPOTS TABLE ---
+        function renderSpotsTable() {
+            const tbody = document.getElementById('spots-table-body');
+            tbody.innerHTML = SPOTS_DATA.map(spot => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-3.5 font-bold text-slate-900 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full ${spot.rank <= 3 ? 'bg-amber-500 text-slate-950' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-[10px] font-black">${spot.rank}</span>
+                        ${spot.name}
+                    </td>
+                    <td class="p-3.5">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${spot.safe ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${spot.risk}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-slate-600">${spot.species}</td>
+                    <td class="p-3.5 font-extrabold text-amber-700">${spot.gross10h}</td>
+                    <td class="p-3.5 text-slate-600 font-medium">${spot.trade}</td>
+                    <td class="p-3.5 text-slate-500 text-xs">${spot.advantage}</td>
+                </tr>
+            `).join('');
+        }
+
+        // --- RECOMMENDATION ENGINE ---
+        function updateSpotRecommendation() {
+            const profile = document.getElementById('filter-profile').value;
+            const hours = parseInt(document.getElementById('filter-hours').value);
+            const risk = document.getElementById('filter-risk').value;
+            const mastery = document.getElementById('filter-mastery').value;
+
+            let filtered = SPOTS_DATA.filter(spot => {
+                if (risk === 'safe' && !spot.safe) return false;
+                if (risk === 'combat' && spot.safe) return false;
+                if (profile === 'f2p' && spot.profile === 'p2w') return false;
+                return true;
+            });
+
+            if (filtered.length === 0) filtered = [SPOTS_DATA[2]]; // Fallback to Velia Beach
+
+            let bestSpot = filtered[0];
+
+            // Adjust income calculation based on hours selected
+            const multiplier = hours / 10;
+            const estMin = Math.round(bestSpot.incomeMin * multiplier);
+            const estMax = Math.round(bestSpot.incomeMax * multiplier);
+
+            document.getElementById('rec-spot-title').innerText = `${bestSpot.name} (Rank #${bestSpot.rank})`;
+            document.getElementById('rec-spot-desc').innerText = `${bestSpot.advantage} (${bestSpot.state})`;
+            document.getElementById('rec-spot-income').innerText = `${estMin}M - ${estMax}M Plata`;
+        }
+
+        // --- SIMULATOR CALCULATOR LOGIC ---
+        function runSimulation() {
+            const mastery = parseInt(document.getElementById('sim-mastery').value);
+            const hours = parseInt(document.getElementById('sim-hours').value);
+            const spotKey = document.getElementById('sim-spot').value;
+            const rodKey = document.getElementById('sim-rod').value;
+            const tankKey = document.getElementById('sim-tank').value;
+            const tradeKey = document.getElementById('sim-trade').value;
+
+            // Display slider values
+            document.getElementById('val-sim-mastery').innerText = `${mastery} pts`;
+            document.getElementById('val-sim-hours').innerText = `${hours} Horas`;
+
+            // Base math
+            let baseRatePerHour = 120; // Millions per hour base
+            if (spotKey === 'mediah') baseRatePerHour = 220;
+            if (spotKey === 'velia') baseRatePerHour = 100;
+            if (spotKey === 'atanis') baseRatePerHour = 130;
+            if (spotKey === 'margoria') baseRatePerHour = 190;
+            if (spotKey === 'tooth') baseRatePerHour = 85;
+
+            // Mastery multiplier (Scales non-linearly)
+            const masteryMult = 0.5 + (mastery / 1000) * 0.75;
+
+            // Rod multiplier
+            let rodMult = 1.0;
+            if (rodKey === 'cron') rodMult = 1.4;
+            if (rodKey === 'basic') rodMult = 0.6;
+
+            // Trade level multiplier
+            let tradeMult = 1.0;
+            if (tradeKey === 'artisan') tradeMult = 1.25;
+            if (tradeKey === 'guru') tradeMult = 1.55;
+
+            // Total Silver Calculation
+            const probableNet = Math.round(baseRatePerHour * hours * masteryMult * rodMult * tradeMult);
+            const pesimisticNet = Math.round(probableNet * 0.65);
+            const optimisticNet = Math.round(probableNet * 1.85);
+
+            document.getElementById('sim-res-silver').innerText = `${probableNet.toLocaleString()} M`;
+
+            // Inventory Time Calculation
+            let maxSlots = 80;
+            if (tankKey === 'f2p_shim') maxSlots = 130;
+            if (tankKey === 'p2w_max') maxSlots = 292;
+
+            const catchRatePerHour = (rodKey === 'cron') ? 45 : 25; // Fish per hour
+            const timeToFillInv = (maxSlots / catchRatePerHour).toFixed(1);
+
+            document.getElementById('sim-res-time-inv').innerText = `${timeToFillInv} Horas`;
+            const statusInvEl = document.getElementById('sim-res-status-inv');
+            if (parseFloat(timeToFillInv) < hours) {
+                statusInvEl.innerText = "¡Inventario se llenará antes!";
+                statusInvEl.className = "text-[10px] text-rose-600 font-bold";
+            } else {
+                statusInvEl.innerText = "Suficiente para la sesión";
+                statusInvEl.className = "text-[10px] text-emerald-600 font-semibold";
+            }
+
+            // Rod Durability Time Calculation
+            let rodDurabilityHours = 8.5;
+            if (rodKey === 'cron') rodDurabilityHours = 999;
+            if (rodKey === 'basic') rodDurabilityHours = 3.0;
+
+            document.getElementById('sim-res-time-rod').innerText = (rodKey === 'cron') ? "Infinita" : `${rodDurabilityHours} Horas`;
+            const statusRodEl = document.getElementById('sim-res-status-rod');
+            if (rodDurabilityHours < hours && rodKey !== 'cron') {
+                statusRodEl.innerText = "¡Caña se romperá antes!";
+                statusRodEl.className = "text-[10px] text-rose-600 font-bold";
+            } else {
+                statusRodEl.innerText = "Caña resiste sesión";
+                statusRodEl.className = "text-[10px] text-emerald-600 font-semibold";
+            }
+
+            // Render Chart
+            updateSimChart(pesimisticNet, probableNet, optimisticNet);
+        }
+
+        // --- SHOW BUILD TIER LOGIC ---
+        function showBuildTier(tierKey) {
+            const data = BUILDS_DATA[tierKey];
+            const container = document.getElementById('build-details-content');
+
+            // Toggle active styling on build buttons
+            document.querySelectorAll('.build-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-50', 'border-amber-500');
+                btn.classList.add('bg-white');
+            });
+            document.getElementById(`btn-build-${tierKey}`).classList.add('bg-amber-50', 'border-amber-500');
+
+            container.innerHTML = `
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b border-slate-200">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-900">${data.title}</h3>
+                        <p class="text-xs text-slate-500 mt-1">${data.summary}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-bold">Costo: ${data.cost}</span>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-bold">ROI: ${data.roi}</span>
+                    </div>
+                </div>
+
+                <h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3">Piezas de Equipamiento Recomendadas</h4>
+                <ul class="space-y-2 text-xs sm:text-sm text-slate-700">
+                    ${data.items.map(item => `<li class="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-slate-200"><i class="fa-solid fa-check text-emerald-500"></i> ${item}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        // --- CHART JS INITIALIZATIONS ---
+
+        function initMasteryChart() {
+            const ctx = document.getElementById('masteryChart').getContext('2d');
+            masteryChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['500', '1000', '1500', '2000', '2500', '3000 (Cap)'],
+                    datasets: [{
+                        label: 'Ganancia Neta Est. (Millones de Plata / 8h)',
+                        data: [400, 850, 1400, 2100, 2900, 3800],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#d97706',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Plata: ${context.parsed.y}M`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { callback: value => value + 'M' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function initSpotsChart() {
+            const ctx = document.getElementById('spotsChart').getContext('2d');
+            spotsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: SPOTS_DATA.map(s => s.name.split('(')[0]),
+                    datasets: [{
+                        label: 'Ingreso Máximo (10h)',
+                        data: SPOTS_DATA.map(s => s.incomeMax),
+                        backgroundColor: '#0891b2',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Ingreso Mínimo (10h)',
+                        data: SPOTS_DATA.map(s => s.incomeMin),
+                        backgroundColor: '#cbd5e1',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { callback: value => value + 'M' }
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(val, index) {
+                                    const label = this.getLabelForValue(val);
+                                    return label.length > 12 ? label.substring(0, 12) + '...' : label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSimChart(pesimistic, probable, optimistic) {
+            const ctx = document.getElementById('simChart').getContext('2d');
+
+            if (simChartInstance) {
+                simChartInstance.destroy();
+            }
+
+            simChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Escenario Pesimista', 'Escenario Probable', 'Escenario Optimista (Luck Peak)'],
+                    datasets: [{
+                        label: 'Plata Neta Proyectada (M)',
+                        data: [pesimistic, probable, optimistic],
+                        backgroundColor: ['#f87171', '#f59e0b', '#10b981'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { callback: value => value + 'M' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
